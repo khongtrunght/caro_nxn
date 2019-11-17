@@ -25,21 +25,86 @@ class boards(object):
         vi_tri = '0'
         while int(vi_tri) not in range(1,self.n ** 2 + 1 ) or  self.check_mark(int(vi_tri)) :
             vi_tri = input("Bạn %s chọn ô nào để đánh : " %(plr.name))
-        i = int(vi_tri) // (self.n -1)
-        j = int(vi_tri) - i*(self.n -1)
+        i = int(vi_tri) // self.n   
+        if int(vi_tri) % self.n == 0 :
+            i = i - 1
+        j = int(vi_tri) - i*self.n -1
         self.boards1[i][j] = plr.marked
+        return i , j
 
-    def check_win(self,i,j):
-        pass
+    def check_ngang(self,player,i,j):
+        for u in range(0,5):
+            win = True
+            for k  in range (0,5):
+                try :
+                    temp = self.boards1[i][j-u+k]
+                except :
+                    temp = 'kjkj'
+                if temp != player.marked :
+                    win = False
+            if win :
+                 return True
+        return False
 
-    def check_full(self):
-        if ' ' not in self.boards :
-            return True
+    def check_doc(self,player,i,j):
+        for u in range(0,5):
+            win = True
+            for k  in range (0,5):
+                try :
+                    temp = self.boards1[i-u+k][j]
+                except : 
+                    temp = 'kjkj'
+                if temp != player.marked :
+                    win = False
+            if win :
+                return True
+        return False
+
+    def check_cheo_chinh(self,player,i,j):
+        for u in range(0,5):
+            win = True
+            for k  in range (0,5):
+                try :
+                    temp = self.boards1[i-u+k][j-u+k] 
+                except:
+                    temp = 'kjkj'
+                if temp != player.marked :
+                    win = False
+            if win :
+                 return True
         return False
     
+    def check_cheo_phu(self,player,i,j):
+        for u in range(0,5):
+            win = True
+            for k  in range (0,5):
+                try:
+                    temp = self.boards1[i-u+k][j+u-k]
+                except:
+                    temp = 'kjkj'
+                if temp != player.marked :
+                    win = False
+            if win :
+                return True
+        return False
+
+
+
+
+
+    def check_win(self,player,i,j):
+        return self.check_ngang(player,i,j) or self.check_doc(player,i,j) or self.check_cheo_chinh(player,i,j) or self.check_cheo_phu(player,i,j)
+
+    def check_full(self):
+        if any (' ' in x for x in self.boards1) :
+            return False
+        return True
+    
     def check_mark(self, x):
-        i = x // (self.n -1)
-        j = x - i*(self.n -1)
+        i = x // self.n 
+        if x % self.n == 0 :
+            i = i - 1
+        j = x - i*self.n -1
         if self.boards1[i][j] == ' ' :
             return False
         return True
@@ -47,7 +112,7 @@ class boards(object):
     def show_up(self,i,j) :
         if self.boards1[i][j]  != ' ' :
             return self.boards1[i][j]
-        return str(i*(self.n-1)+j)
+        return str(i*(self.n)+j+1)
         
 
     def show_boards(self):
@@ -60,7 +125,7 @@ class boards(object):
                     print( format(int(self.show_up(i,j)),'03d') + ' | '  , end = '')
                 else :
                     print( ' ' + self.show_up(i,j) + ' ' + ' | '  , end = '')
-            print('\n' + '-'*self.n*9)
+            print('\n' + '-'*self.n*4)
 
 
         
@@ -71,14 +136,13 @@ class boards(object):
 
 class player(object):
     def __init__(self):
-        self.marked = ' '
         self.name = input("Tên của người chơi là gì ? :  ")
         self.marked = input("Chọn kí hiệu cho %s :  " %(self.name)) 
 
     def pick_o(self,bod):
         #i = x // (bod.n -1)
         #j = x - i*(bod.n -1)
-        bod.lay_o_danh(self)
+        return bod.lay_o_danh(self)
 
 
 
@@ -104,8 +168,9 @@ def coop_mode() :
     luot = pick_first
     while on_game :
         bang.show_boards()
-        players[luot].pick_o(bang)
-        if bang.check_win :
+        a = players[luot].pick_o(bang)
+        if bang.check_win(players[luot],a[0],a[1]) :
+            bang.show_boards()
             print("Chúc mừng %s đã chiến thắng !!  "%(players[luot].name))
             on_game = False
         else:
@@ -113,7 +178,7 @@ def coop_mode() :
                 print("Không ai thắng cả :(( ")
                 on_game = False
             else:
-                Luot = abs(luot -1 )
+                luot = abs(luot -1 )
 
         
 
