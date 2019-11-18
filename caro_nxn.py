@@ -2,6 +2,8 @@ from IPython.display import clear_output
 from os import system, name
 import random
 from typing import List, Any
+import sys
+from termcolor import colored, cprint
 
 
 def clear():
@@ -121,11 +123,15 @@ class boards(object):
             print (' ')
             for j in range(self.n ):   
               #hom sau sua lai theo error except 
-                if self.show_up(i,j) not in ('X','O') :
+                if self.show_up(i,j) not in "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM" :
                     print( format(int(self.show_up(i,j)),'03d') + ' | '  , end = '')
                 else :
-                    print( ' ' + self.show_up(i,j) + ' ' + ' | '  , end = '')
-            print('\n' + '-'*self.n*4)
+                    if players[0].marked == self.boards1[i][j] :
+                        temp_color = players[0].color
+                    else :
+                        temp_color = players[1].color
+                    print( ' ' + colored(self.show_up(i,j),temp_color ) + ' ' + ' | '  , end = '')
+            print('\n' + '-'*self.n*6)
 
 
         
@@ -135,9 +141,10 @@ class boards(object):
 
 
 class player(object):
-    def __init__(self):
+    def __init__(self,color):
         self.name = input("Tên của người chơi là gì ? :  ")
         self.marked = input("Chọn kí hiệu cho %s :  " %(self.name)) 
+        self.color = color
 
     def pick_o(self,bod):
         #i = x // (bod.n -1)
@@ -159,8 +166,8 @@ def coop_mode() :
     global players 
     global luot
     players = []
-    players.append( player())
-    players.append( player())
+    players.append( player('yellow'))
+    players.append( player('blue'))
     import random
     pick_first = random.randint(0,1)
     print("Xin chúc mừng bạn %s đã được đánh trước !! " %(players[pick_first])) 
@@ -180,11 +187,6 @@ def coop_mode() :
             else:
                 luot = abs(luot -1 )
 
-        
-
-
-
-    
 
 def main() :
     while True :
