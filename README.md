@@ -7,3 +7,5 @@ B3 : cài pip3 (nếu chưa cài )
 B4 : python3 caro_nxn.py 
 B5 : Chúc bạn chơi game vui vẻ 
 
+Developed by MT2K1 Official 
+
